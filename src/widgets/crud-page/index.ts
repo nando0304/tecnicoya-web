@@ -1,0 +1,1 @@
+export { CrudPage } from './CrudPage'

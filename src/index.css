@@ -1,6 +1,86 @@
 @import 'tailwindcss';
 @plugin 'daisyui' {
-  themes:
-    light --default,
-    dark --prefersdark;
+  themes: tecnicoya --default;
+}
+
+/* Paleta de la guía de diseño de TécnicoYa (diseño/*.png) */
+@plugin 'daisyui/theme' {
+  name: 'tecnicoya';
+  default: true;
+  color-scheme: light;
+
+  --color-base-100: #ffffff;
+  --color-base-200: #f9fafb;
+  --color-base-300: #e5e7eb;
+  --color-base-content: #111827;
+
+  --color-primary: #7c3aed;
+  --color-primary-content: #ffffff;
+  --color-secondary: #1a0e3d;
+  --color-secondary-content: #ffffff;
+  --color-accent: #fbbf24;
+  --color-accent-content: #1a0e3d;
+  --color-neutral: #111827;
+  --color-neutral-content: #ffffff;
+
+  --color-info: #8b5cf6;
+  --color-info-content: #ffffff;
+  --color-success: #10b981;
+  --color-success-content: #ffffff;
+  --color-warning: #fbbf24;
+  --color-warning-content: #1a0e3d;
+  --color-error: #ef4444;
+  --color-error-content: #ffffff;
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@theme {
+  --font-sans: 'Inter Variable', system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  /* Tonos complementarios de la misma guía */
+  --color-primary-strong: #6332e9;
+  --color-primary-soft: #f5f3ff;
+  --color-primary-tint: #ede9ff;
+  --color-primary-light: #c4b5fd;
+  --color-navy: #2d1b69;
+  --color-success-soft: #d1fae5;
+  --color-muted: #4b5563;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-base-200 text-base-content font-sans;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-primary) 25%, transparent);
+  }
+
+  :focus-visible {
+    outline-color: var(--color-primary);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

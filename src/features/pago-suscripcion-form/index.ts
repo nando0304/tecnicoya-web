@@ -1,0 +1,1 @@
+export { PagoSuscripcionForm } from './PagoSuscripcionForm'

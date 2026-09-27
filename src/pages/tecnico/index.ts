@@ -1,0 +1,6 @@
+export { MisServiciosPage } from './MisServiciosPage'
+export { PagosTecnicoPage } from './PagosTecnicoPage'
+export { PerfilTecnicoPage } from './PerfilTecnicoPage'
+export { DisponibilidadPage, EvidenciasTecnicoPage, ExperienciaPage, ResenasPage } from './SeccionesTecnicoPages'
+export { SuscripcionPage } from './SuscripcionPage'
+export { TecnicoHomePage } from './TecnicoHomePage'
