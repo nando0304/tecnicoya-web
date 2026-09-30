@@ -3,7 +3,10 @@ import { ApiError, type ApiErrorBody } from './api-error'
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE'
 
-const SIN_CONEXION = 'No se pudo conectar con el servidor. Verifica que la API esté en ejecución.'
+// La petición ni siquiera salió: el servidor web (Vite) está apagado o no hay red
+const SIN_SERVIDOR_WEB = 'No se pudo conectar con el servidor web. Verifica que "npm run dev" esté en ejecución y recarga la página.'
+// El servidor web respondió, pero su proxy no alcanzó la API
+const SIN_API = 'La API no responde. Verifica que tecnicoya-api esté en ejecución en el puerto 8080.'
 
 async function request<T>(method: Method, path: string, body?: unknown): Promise<T> {
   const headers: Record<string, string> = { Accept: 'application/json' }
@@ -17,7 +20,7 @@ async function request<T>(method: Method, path: string, body?: unknown): Promise
       body: body === undefined ? undefined : JSON.stringify(body),
     })
   } catch {
-    throw new ApiError(0, SIN_CONEXION)
+    throw new ApiError(0, SIN_SERVIDOR_WEB)
   }
 
   if (response.status === 204) return undefined as T
@@ -27,7 +30,7 @@ async function request<T>(method: Method, path: string, body?: unknown): Promise
     const error = data as Partial<ApiErrorBody> | null
     // Sin cuerpo JSON: el proxy de Vite no alcanzó la API
     if (!error?.mensaje) {
-      throw new ApiError(response.status, response.status >= 500 ? SIN_CONEXION : `Error ${response.status}`)
+      throw new ApiError(response.status, response.status >= 500 ? SIN_API : `Error ${response.status}`)
     }
     throw new ApiError(response.status, error.mensaje, error.errores)
   }
