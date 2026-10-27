@@ -7,8 +7,8 @@ import { toast } from '@/shared/ui'
 import { useLogout } from './use-logout'
 
 /**
- * La sesión vive en el navegador (la API no emite tokens): al entrar se vuelve a consultar
- * el usuario para reflejar cambios hechos por un administrador, como un bloqueo o una eliminación.
+ * El token sigue siendo válido aunque un administrador cambie la cuenta: al entrar se vuelve a consultar
+ * el usuario para reflejar esos cambios, como un bloqueo o una eliminación.
  */
 export function useSincronizarSesion(usuario: Usuario) {
   const actualizar = useSession((s) => s.actualizar)

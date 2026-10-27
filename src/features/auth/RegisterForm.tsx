@@ -4,7 +4,7 @@ import { AlertCircle, Lock, Mail, Phone, UserRound, Wrench } from 'lucide-react'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
-import { INICIO_POR_ROL, login, useSession } from '@/entities/session'
+import { INICIO_POR_ROL, login, useSession, type Sesion } from '@/entities/session'
 import { tecnicoApi } from '@/entities/tecnico'
 import { usuarioApi } from '@/entities/usuario'
 import { ApiError, getErrorMessage } from '@/shared/api'
@@ -89,20 +89,23 @@ export function RegisterForm() {
       return
     }
 
-    // La cuenta ya existe: si falla el perfil técnico, podrá completarlo al iniciar sesión
+    // La cuenta ya existe: se inicia sesión para obtener el token que piden las demás peticiones
+    let sesion: Sesion
+    try {
+      sesion = await login({ correo: valores.correo, contrasena: valores.contrasena })
+    } catch {
+      await navigate({ to: '/login' })
+      return
+    }
+    iniciar(sesion, false)
+
+    // Si falla el perfil técnico, podrá completarlo después desde su panel
     if (valores.tipoUsuario === 'TECNICO') {
       await tecnicoApi
         .create({ usuarioId, especialidad: valores.especialidad, descripcion: textoOpcional(valores.descripcion) })
         .catch(() => undefined)
     }
-
-    try {
-      const usuario = await login({ correo: valores.correo, contrasena: valores.contrasena })
-      iniciar(usuario, false)
-      await navigate({ to: INICIO_POR_ROL[usuario.tipoUsuario] })
-    } catch {
-      await navigate({ to: '/login' })
-    }
+    await navigate({ to: INICIO_POR_ROL[sesion.usuario.tipoUsuario] })
   })
 
   return (

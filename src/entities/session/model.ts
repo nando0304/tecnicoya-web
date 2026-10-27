@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 import type { TipoUsuario, Usuario } from '@/entities/usuario'
+import { configurarToken } from '@/shared/api'
+import type { Sesion } from './api'
 
 const CLAVE = 'tecnicoya.sesion'
 
@@ -12,10 +14,12 @@ function almacen(recordar: boolean): Storage | null {
   }
 }
 
-function leer(recordar: boolean): Usuario | null {
+function leer(recordar: boolean): Sesion | null {
   try {
     const guardado = almacen(recordar)?.getItem(CLAVE)
-    return guardado ? (JSON.parse(guardado) as Usuario) : null
+    const sesion = guardado ? (JSON.parse(guardado) as Partial<Sesion>) : null
+    // Las sesiones guardadas antes de usar tokens solo tienen el usuario: se pide iniciar sesión otra vez
+    return sesion?.token && sesion.usuario ? (sesion as Sesion) : null
   } catch {
     return null
   }
@@ -31,10 +35,10 @@ function borrar() {
   }
 }
 
-function guardar(usuario: Usuario, recordar: boolean) {
+function guardar(sesion: Sesion, recordar: boolean) {
   borrar()
   try {
-    almacen(recordar)?.setItem(CLAVE, JSON.stringify(usuario))
+    almacen(recordar)?.setItem(CLAVE, JSON.stringify(sesion))
   } catch {
     /* la sesión dura solo mientras la pestaña esté abierta */
   }
@@ -42,31 +46,39 @@ function guardar(usuario: Usuario, recordar: boolean) {
 
 interface SessionState {
   usuario: Usuario | null
+  /** Token JWT que la API exige en la cabecera Authorization de cada petición. */
+  token: string | null
   /** true: la sesión sobrevive al cerrar el navegador (localStorage). */
   recordar: boolean
-  iniciar: (usuario: Usuario, recordar: boolean) => void
+  iniciar: (sesion: Sesion, recordar: boolean) => void
   actualizar: (usuario: Usuario) => void
   cerrar: () => void
 }
 
 const recordada = leer(true)
+const inicial = recordada ?? leer(false)
 
 export const useSession = create<SessionState>((set, get) => ({
-  usuario: recordada ?? leer(false),
+  usuario: inicial?.usuario ?? null,
+  token: inicial?.token ?? null,
   recordar: recordada !== null,
-  iniciar: (usuario, recordar) => {
-    guardar(usuario, recordar)
-    set({ usuario, recordar })
+  iniciar: ({ token, usuario }, recordar) => {
+    guardar({ token, usuario }, recordar)
+    set({ token, usuario, recordar })
   },
   actualizar: (usuario) => {
-    guardar(usuario, get().recordar)
+    const { token, recordar } = get()
+    if (token) guardar({ token, usuario }, recordar)
     set({ usuario })
   },
   cerrar: () => {
     borrar()
-    set({ usuario: null })
+    set({ token: null, usuario: null })
   },
 }))
+
+// El cliente HTTP lee aquí el token en cada petición
+configurarToken(() => useSession.getState().token)
 
 /** Usuario de la sesión. Solo para pantallas protegidas: el layout no las renderiza sin sesión. */
 export function useUsuarioActual(): Usuario {

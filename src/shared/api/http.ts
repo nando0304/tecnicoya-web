@@ -8,9 +8,18 @@ const SIN_SERVIDOR_WEB = 'No se pudo conectar con el servidor web. Verifica que 
 // El servidor web respondió, pero su proxy no alcanzó la API
 const SIN_API = 'La API no responde. Verifica que tecnicoya-api esté en ejecución en el puerto 8080.'
 
+let obtenerToken: () => string | null = () => null
+
+/** La sesión indica de dónde leer el token JWT que se envía en cada petición. */
+export function configurarToken(obtener: () => string | null) {
+  obtenerToken = obtener
+}
+
 async function request<T>(method: Method, path: string, body?: unknown): Promise<T> {
   const headers: Record<string, string> = { Accept: 'application/json' }
   if (body !== undefined) headers['Content-Type'] = 'application/json'
+  const token = obtenerToken()
+  if (token) headers.Authorization = `Bearer ${token}`
 
   let response: Response
   try {

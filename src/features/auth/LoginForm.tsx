@@ -42,9 +42,9 @@ export function LoginForm() {
   const onSubmit = handleSubmit(async ({ correo, contrasena, recordar }) => {
     setErrorGeneral(null)
     try {
-      const usuario = await login({ correo, contrasena })
-      iniciar(usuario, recordar)
-      await navigate({ to: INICIO_POR_ROL[usuario.tipoUsuario] })
+      const sesion = await login({ correo, contrasena })
+      iniciar(sesion, recordar)
+      await navigate({ to: INICIO_POR_ROL[sesion.usuario.tipoUsuario] })
     } catch (error) {
       setErrorGeneral(getErrorMessage(error))
     }

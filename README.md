@@ -65,6 +65,9 @@ src/
 ```
 
 - `shared/api/crud.ts` genera el cliente y los hooks de cualquier recurso: todos exponen el mismo CRUD.
+- Al iniciar sesión la API devuelve un token JWT: `entities/session` lo guarda junto al usuario y
+  `shared/api/http.ts` lo envía en la cabecera `Authorization: Bearer <token>` de cada petición.
+  Si la API responde 401 (token vencido), `app/providers` cierra la sesión y vuelve al login.
 - `widgets/crud-page` arma un mantenimiento completo a partir de columnas y un formulario.
 - Los formularios validan con Zod las mismas reglas que los DTO de la API, y los errores de la API
   se muestran bajo el campo correspondiente.
@@ -88,8 +91,8 @@ Los colores salen de `diseño/*.png` y se definen como tema de DaisyUI en `src/i
 
 ## Limitaciones conocidas
 
-- La API no emite tokens: la sesión se guarda en el navegador y los endpoints siguen abiertos.
-  Para producción conviene agregar Spring Security con JWT.
+- La API exige un token JWT, pero no revisa roles: cualquier usuario con sesión puede llamar a cualquier endpoint.
+  Las pantallas de cada rol se protegen solo en el navegador (guardas del router).
 - La API no recibe archivos: evidencias y comprobantes se registran como enlaces (Drive, OneDrive…).
 - La API no tiene filtros por usuario: el frontend descarga cada listado y filtra en el navegador.
   Funciona con volúmenes académicos, pero con muchos datos convendría agregar endpoints filtrados y paginados.
