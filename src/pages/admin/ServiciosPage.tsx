@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { EstadoServicio, Prioridad, useRemoveServicio, useServicios, type Servicio } from '@/entities/servicio'
+import { ExportarReporteButton } from '@/features/exportar-reporte'
 import { ServicioForm } from '@/features/servicio-form'
 import { formatFecha, formatFechaHora } from '@/shared/lib'
 import { useBusquedaInicial } from '@/shared/lib/use-busqueda'
@@ -48,6 +49,7 @@ export function ServiciosPage() {
       searchPlaceholder="Buscar por título, cliente o técnico…"
       initialSearch={busqueda}
       filter={estado ? (s) => s.estadoServicio === estado : undefined}
+      headerActions={<ExportarReporteButton reporte="servicios" />}
       toolbar={<FilterSelect label="Estado" value={estado} onChange={setEstado} options={EstadoServicio.options} />}
       renderForm={({ item, cerrar }) => <ServicioForm servicio={item} modo="admin" onSuccess={cerrar} onCancel={cerrar} />}
       onDelete={(s) => eliminar.mutateAsync(s.idServicio)}

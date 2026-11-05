@@ -25,6 +25,8 @@ interface CrudPageProps<T> {
   /** Filtro adicional (p. ej. por estado) controlado por la página. */
   filter?: (row: T) => boolean
   toolbar?: ReactNode
+  /** Botones extra en la cabecera, junto a "Nuevo …" (p. ej. exportar a Excel). */
+  headerActions?: ReactNode
   renderForm: (props: { item?: T; cerrar: () => void }) => ReactNode
   onDelete: (row: T) => Promise<unknown>
   /** Cómo nombrar el registro en la confirmación de borrado. */
@@ -48,6 +50,7 @@ export function CrudPage<T>({
   initialSearch,
   filter,
   toolbar,
+  headerActions,
   renderForm,
   onDelete,
   describir,
@@ -77,10 +80,13 @@ export function CrudPage<T>({
         title={title}
         description={description}
         actions={
-          <button type="button" className="btn btn-primary shadow-md shadow-primary/25" onClick={() => setFormulario({})}>
-            <Plus className="size-4" />
-            {nuevo} {entidad}
-          </button>
+          <>
+            {headerActions}
+            <button type="button" className="btn btn-primary shadow-md shadow-primary/25" onClick={() => setFormulario({})}>
+              <Plus className="size-4" />
+              {nuevo} {entidad}
+            </button>
+          </>
         }
       />
 

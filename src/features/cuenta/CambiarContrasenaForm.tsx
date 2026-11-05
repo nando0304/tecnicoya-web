@@ -4,12 +4,13 @@ import { z } from 'zod'
 import { login } from '@/entities/session'
 import { toUsuarioRequest, useUpdateUsuario, type Usuario } from '@/entities/usuario'
 import { ApiError, getErrorMessage } from '@/shared/api'
+import * as v from '@/shared/lib/validacion'
 import { ejecutar, FormActions, TextField, toast } from '@/shared/ui'
 
 const esquema = z
   .object({
     actual: z.string().min(1, 'Ingresa tu contraseña actual'),
-    nueva: z.string().min(8, 'Mínimo 8 caracteres').max(72, 'Máximo 72 caracteres'),
+    nueva: v.contrasena,
     confirmacion: z.string(),
   })
   .refine((f) => f.nueva === f.confirmacion, { path: ['confirmacion'], message: 'Las contraseñas no coinciden' })

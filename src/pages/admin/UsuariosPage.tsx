@@ -8,6 +8,7 @@ import {
   useUsuarios,
   type Usuario,
 } from '@/entities/usuario'
+import { ExportarReporteButton } from '@/features/exportar-reporte'
 import { UsuarioForm } from '@/features/usuario-form'
 import { formatFecha } from '@/shared/lib'
 import { Avatar, FilterSelect, StatusBadge, type Column } from '@/shared/ui'
@@ -48,6 +49,7 @@ export function UsuariosPage() {
       searchText={(u) => `${nombreCompleto(u)} ${u.correo} ${u.telefono ?? ''}`}
       searchPlaceholder="Buscar por nombre o correo…"
       filter={tipo ? (u) => u.tipoUsuario === tipo : undefined}
+      headerActions={<ExportarReporteButton reporte="usuarios" />}
       toolbar={<FilterSelect label="Tipo" value={tipo} onChange={setTipo} options={TipoUsuario.options} />}
       renderForm={({ item, cerrar }) => <UsuarioForm usuario={item} onSuccess={cerrar} onCancel={cerrar} />}
       onDelete={(u) => eliminar.mutateAsync(u.idUsuario)}

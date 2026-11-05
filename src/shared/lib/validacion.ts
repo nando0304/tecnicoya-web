@@ -8,9 +8,28 @@ import { z } from 'zod'
 
 const maximo = (max: number) => `Máximo ${max} caracteres`
 
-export const texto = (mensaje: string, max: number) => z.string().trim().min(1, mensaje).max(max, maximo(max))
+// Igual que @SinHtml en la API: rechaza etiquetas HTML y código JavaScript (defensa contra XSS)
+const ETIQUETA_HTML = /<\s*[a-zA-Z/!?]/
+const PATRONES_PELIGROSOS = ['javascript:', 'vbscript:', 'data:text/html', 'onerror=', 'onload=']
+const SIN_HTML = 'No se permiten etiquetas HTML ni código JavaScript'
 
-export const textoLibre = (max: number) => z.string().trim().max(max, maximo(max))
+export const sinHtml = (valor: string) => {
+  const compacto = valor.replace(/\s+/g, '').toLowerCase()
+  return !ETIQUETA_HTML.test(valor) && !PATRONES_PELIGROSOS.some((patron) => compacto.includes(patron))
+}
+
+export const texto = (mensaje: string, max: number) =>
+  z.string().trim().min(1, mensaje).max(max, maximo(max)).refine(sinHtml, SIN_HTML)
+
+export const textoLibre = (max: number) => z.string().trim().max(max, maximo(max)).refine(sinHtml, SIN_HTML)
+
+/** Política de contraseñas de la API: entre 8 y 72 caracteres, con al menos una letra y un número. */
+export const REGLA_CONTRASENA = 'Entre 8 y 72 caracteres, con al menos una letra y un número'
+
+export const contrasenaSegura = (valor: string) =>
+  valor.length >= 8 && valor.length <= 72 && /[A-Za-z]/.test(valor) && /\d/.test(valor)
+
+export const contrasena = z.string().refine(contrasenaSegura, REGLA_CONTRASENA)
 
 export const seleccion = (mensaje: string) => z.string().min(1, mensaje)
 

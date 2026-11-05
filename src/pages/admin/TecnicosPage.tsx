@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router'
 import { Eye } from 'lucide-react'
 import { useState } from 'react'
 import { EstadoVerificacion, useRemoveTecnico, useTecnicos, type Tecnico } from '@/entities/tecnico'
+import { ExportarReporteButton } from '@/features/exportar-reporte'
 import { TecnicoForm } from '@/features/tecnico-form'
 import { Avatar, FilterSelect, StatusBadge, type Column } from '@/shared/ui'
 import { CrudPage } from '@/widgets/crud-page'
@@ -40,6 +41,7 @@ export function TecnicosPage() {
       searchText={(t) => `${t.nombreCompleto} ${t.correo} ${t.especialidad}`}
       searchPlaceholder="Buscar por nombre o especialidad…"
       filter={estado ? (t) => t.estadoVerificacion === estado : undefined}
+      headerActions={<ExportarReporteButton reporte="tecnicos" />}
       toolbar={<FilterSelect label="Verificación" value={estado} onChange={setEstado} options={EstadoVerificacion.options} />}
       rowActions={(t) => (
         <Link

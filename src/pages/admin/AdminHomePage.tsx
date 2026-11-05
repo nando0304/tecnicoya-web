@@ -9,6 +9,7 @@ import { useUsuarioActual } from '@/entities/session'
 import { toSuscripcionRequest, useSuscripciones, useUpdateSuscripcion } from '@/entities/suscripcion'
 import { toTecnicoRequest, useTecnicos, useUpdateTecnico } from '@/entities/tecnico'
 import { useUsuarios } from '@/entities/usuario'
+import { ExportarReporteButton } from '@/features/exportar-reporte'
 import { cn, formatFecha, formatFechaHora, formatMoneda, type Tone } from '@/shared/lib'
 import { MetodoPago } from '@/shared/model/enums'
 import {
@@ -86,6 +87,7 @@ export function AdminHomePage() {
       <PageHeader
         title={`Hola, ${usuario.nombres.split(' ')[0]}`}
         description="Resumen de la actividad de TécnicoYa y tareas pendientes de revisión."
+        actions={<ExportarReporteButton reporte="general" label="Descargar reporte general" />}
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

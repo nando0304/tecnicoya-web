@@ -27,8 +27,8 @@ function crearEsquema(esNuevo: boolean) {
     .superRefine(({ contrasena }, ctx) => {
       if (esNuevo && !contrasena) {
         ctx.addIssue({ code: 'custom', path: ['contrasena'], message: 'Ingresa una contraseña' })
-      } else if (contrasena && (contrasena.length < 8 || contrasena.length > 72)) {
-        ctx.addIssue({ code: 'custom', path: ['contrasena'], message: 'Debe tener entre 8 y 72 caracteres' })
+      } else if (contrasena && !v.contrasenaSegura(contrasena)) {
+        ctx.addIssue({ code: 'custom', path: ['contrasena'], message: v.REGLA_CONTRASENA })
       }
     })
 }

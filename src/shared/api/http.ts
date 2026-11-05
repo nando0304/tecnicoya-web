@@ -46,9 +46,49 @@ async function request<T>(method: Method, path: string, body?: unknown): Promise
   return data as T
 }
 
+/** Nombre del archivo indicado por la API en Content-Disposition: attachment; filename="..." */
+function nombreArchivo(response: Response, porDefecto: string): string {
+  const cabecera = response.headers.get('Content-Disposition') ?? ''
+  return /filename="?([^";]+)"?/i.exec(cabecera)?.[1] ?? porDefecto
+}
+
+/**
+ * Descarga un archivo protegido (p. ej. un reporte Excel). Un enlace <a href> no enviaría el token, así que se
+ * pide con fetch, se arma un Blob y se dispara la descarga desde un enlace temporal.
+ */
+async function descargar(path: string, porDefecto: string): Promise<void> {
+  const headers: Record<string, string> = {
+    // Si la API responde con error, lo hace en JSON
+    Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/json',
+  }
+  const token = obtenerToken()
+  if (token) headers.Authorization = `Bearer ${token}`
+
+  let response: Response
+  try {
+    response = await fetch(`${API_URL}${path}`, { headers })
+  } catch {
+    throw new ApiError(0, SIN_SERVIDOR_WEB)
+  }
+  if (!response.ok) {
+    const error = (await response.json().catch(() => null)) as Partial<ApiErrorBody> | null
+    throw new ApiError(response.status, error?.mensaje ?? (response.status >= 500 ? SIN_API : `Error ${response.status}`))
+  }
+
+  const url = URL.createObjectURL(await response.blob())
+  const enlace = document.createElement('a')
+  enlace.href = url
+  enlace.download = nombreArchivo(response, porDefecto)
+  document.body.appendChild(enlace)
+  enlace.click()
+  enlace.remove()
+  URL.revokeObjectURL(url)
+}
+
 export const http = {
   get: <T>(path: string) => request<T>('GET', path),
   post: <T>(path: string, body: unknown) => request<T>('POST', path, body),
   put: <T>(path: string, body: unknown) => request<T>('PUT', path, body),
   delete: (path: string) => request<void>('DELETE', path),
+  descargar,
 }

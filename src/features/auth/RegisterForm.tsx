@@ -19,7 +19,7 @@ const esquema = z
     apellidos: v.texto('Ingresa tus apellidos', 100),
     correo: v.correo,
     telefono: v.telefono,
-    contrasena: z.string().min(8, 'Mínimo 8 caracteres').max(72, 'Máximo 72 caracteres'),
+    contrasena: v.contrasena,
     confirmacion: z.string(),
     especialidad: v.textoLibre(100),
     descripcion: v.textoLibre(1000),
