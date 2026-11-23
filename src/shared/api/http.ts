@@ -41,7 +41,12 @@ async function request<T>(method: Method, path: string, body?: unknown): Promise
     if (!error?.mensaje) {
       throw new ApiError(response.status, response.status >= 500 ? SIN_API : `Error ${response.status}`)
     }
-    throw new ApiError(response.status, error.mensaje, error.errores)
+    // En un error del servidor se muestra el código de la petición (X-Request-Id): con él se encuentra en los logs
+    const idPeticion = response.headers.get('X-Request-Id')
+    const mensaje = response.status >= 500 && idPeticion
+      ? `${error.mensaje} Código de referencia: ${idPeticion}`
+      : error.mensaje
+    throw new ApiError(response.status, mensaje, error.errores)
   }
   return data as T
 }
